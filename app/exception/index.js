@@ -8,7 +8,7 @@ function formatError(err) {
 }
 
 module.exports = (err, req, res, next) => {
-    console.log(err.message);
+    console.log(err);
     
     switch (err.constructor) {
         case ValidationError: {

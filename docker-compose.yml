@@ -25,11 +25,26 @@ services:
       CACHE_HOST: cache
     links:
       - mongo
+      - user
+      - cache
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+
+  user:
+    image: wi4er/groot:0.10.0
+    container_name: user_api
+    environment:
+      DB_HOST: mongo
+      DB_USER: user
+      DB_PASSWORD: example
+      CACHE_HOST: cache
+    links:
+      - mongo
       - cache
     ports:
       - "8081:8080"
-    volumes:
-      - .:/app
 
   cache:
     image: redis:alpine

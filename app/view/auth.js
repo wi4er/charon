@@ -1,6 +1,6 @@
 const {Router} = require("express");
 const router = Router();
-const Auth = require("../model/Auth");
+const Hash = require("../model/Hash");
 const WrongIdError = require("../exception/WrongIdError");
 const {AUTH} = require("../permission/entity");
 const {GET, POST, PUT, DELETE} = require("../permission/method");
@@ -10,7 +10,7 @@ router.get(
     "/",
     permissionCheck(AUTH, GET),
     (req, res, next) => {
-        Auth.find(
+        Hash.find(
             require("../query/authFilter").parseFilter(req.query.filter)
         )
             .then(result => res.send(result))
@@ -24,7 +24,7 @@ router.get(
     (req, res, next) => {
         const {params: {id}} = req;
 
-        Auth.findById(id)
+        Hash.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant find auth with id ${id}!`);
 
@@ -38,7 +38,7 @@ router.post(
     "/",
     permissionCheck(AUTH, POST),
     (req, res, next) => {
-        new Auth(req.body).save()
+        new Hash(req.body).save()
             .then(result => {
                 res.status(201);
                 res.send(result);
@@ -55,7 +55,7 @@ router.put(
 
         WrongIdError.assert(id === req.body._id, "Wrong id in body request");
 
-        Auth.findById(id)
+        Hash.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant update auth with id ${id}!`);
 
@@ -72,7 +72,7 @@ router.delete(
     (req, res, next) => {
         const {params: {id}} = req;
 
-        Auth.findById(id)
+        Hash.findById(id)
             .then(result => {
                 WrongIdError.assert(result, `Cant delete auth with id ${id}!`);
 

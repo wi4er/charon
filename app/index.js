@@ -10,10 +10,8 @@ try {
         res.send("<h1 style='display: flex; align-items: center; justify-content: center; height: 100vh'> $$$ CHARON $$$ </h1>");
     });
 
-
-
-
-
+    app.use("/auth/", require("./view/auth"));
+    app.use("/token/", require("./view/token"));
 
     app.use(require("./exception"));
 

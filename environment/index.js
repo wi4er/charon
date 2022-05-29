@@ -12,7 +12,7 @@ class Environment {
      * Пользователь базы данных
      */
     get DB_USER() {
-        return process.env.DB_USER || "auth";
+        return process.env.DB_USER || "pass";
     }
 
     /**
@@ -36,8 +36,11 @@ class Environment {
         return process.env.DB_PORT || "27017";
     }
 
+    /**
+     * Имя базы данных
+     */
     get DB_NAME() {
-        return process.env.DB_NAME || "auth";
+        return process.env.DB_NAME || "pass";
     }
 
     get DB_URL() {
@@ -54,6 +57,10 @@ class Environment {
 
     get DEFAULT_PUBLIC_GROUP() {
         return process.env.DEFAULT_PUBLIC_GROUP;
+    }
+
+    get ENABLE_PUBLIC_USER() {
+        return !!process.env.ENABLE_PUBLIC_USER;
     }
 }
 

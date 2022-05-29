@@ -7,8 +7,9 @@ pass.createUser(
         roles: [
             {
                 role: "readWrite",
-                db: "auth"
+                db: "pass"
             }
         ]
     }
 );
+
