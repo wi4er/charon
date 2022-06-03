@@ -39,6 +39,7 @@ services:
       DB_HOST: mongo
       DB_USER: user
       DB_PASSWORD: example
+      DB_NAME: user
       CACHE_HOST: cache
     links:
       - mongo

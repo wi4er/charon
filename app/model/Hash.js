@@ -5,12 +5,17 @@ const HashSchema = new mongoose.Schema({
     user: {
         type: String,
         required: true,
+        unique: true,
     },
     hash: {
         type: String,
         required: true,
     },
-    algorithm: String,
+    algorithm: {
+        type: String,
+        enum: Object.keys(require("../encode")),
+        required: true,
+    },
 });
 
 HashSchema.pre("save", next => {

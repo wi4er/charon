@@ -2,25 +2,24 @@ const {Router} = require("express");
 const router = Router();
 const Hash = require("../model/Hash");
 const PermissionError = require("../exception/PermissionError");
-const md5 = require("md5");
 const createToken = require("../permission/createToken");
 const WrongRefError = require("../exception/WrongRefError");
 const env = require("../../environment");
+const {postUser} = require("../fetch/fetchUser");
 
 router.get(
     "/public/",
     (req, res, next) => {
         PermissionError.assert(env.ENABLE_PUBLIC_USER, "Public user not enable");
+        const user = {};
 
-        // const user = new User({});
-        //
-        // if (env.DEFAULT_PUBLIC_GROUP) {
-        //     user.group = env.DEFAULT_PUBLIC_GROUP;
-        // }
-        //
-        // user.save()
-        //     .then(inst => res.send(createToken(inst)))
-        //     .catch(next);
+        if (env.DEFAULT_PUBLIC_GROUP) {
+            user.section = env.DEFAULT_PUBLIC_GROUP;
+        }
+
+        postUser(user)
+            .then(inst => res.json({authorization: createToken(inst)}))
+            .catch(next);
     }
 );
 

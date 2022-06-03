@@ -5,15 +5,29 @@ const WrongIdError = require("../exception/WrongIdError");
 const {AUTH} = require("../permission/entity");
 const {GET, POST, PUT, DELETE} = require("../permission/method");
 const permissionCheck = require("../permission/check");
+const authQuery = require("../query/authQuery");
 
 router.get(
     "/",
     permissionCheck(AUTH, GET),
     (req, res, next) => {
-        Hash.find(
-            require("../query/authFilter").parseFilter(req.query.filter)
-        )
-            .then(result => res.send(result))
+        const {query: {filter, sort, limit, offset}} = req;
+        const parsedFilter = authQuery.parseFilter(filter);
+        const parsedSort = authQuery.parseSort(sort);
+
+        Promise.all([
+            Hash.count(parsedFilter),
+            Hash.find(parsedFilter)
+                .sort(parsedSort)
+                .limit(+limit)
+                .skip(+offset)
+        ])
+            .then(([count, list]) => {
+                res.header("total-row-count", count);
+                res.header("Access-Control-Expose-Headers", "total-row-count");
+
+                res.json(list);
+            })
             .catch(next);
     }
 );
@@ -28,7 +42,7 @@ router.get(
             .then(result => {
                 WrongIdError.assert(result, `Cant find auth with id ${id}!`);
 
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -41,7 +55,7 @@ router.post(
         new Hash(req.body).save()
             .then(result => {
                 res.status(201);
-                res.send(result);
+                res.json(result);
             })
             .catch(next);
     }
@@ -53,7 +67,7 @@ router.put(
     (req, res, next) => {
         const {params: {id}} = req;
 
-        WrongIdError.assert(id === req.body._id, "Wrong id in body request");
+        WrongIdError.assert(id === req.body._id, "Wrong id in request body");
 
         Hash.findById(id)
             .then(result => {
@@ -61,7 +75,7 @@ router.put(
 
                 return Object.assign(result, req.body).save();
             })
-            .then(saved => res.send(saved))
+            .then(saved => res.json(saved))
             .catch(next);
     }
 );
@@ -76,9 +90,12 @@ router.delete(
             .then(result => {
                 WrongIdError.assert(result, `Cant delete auth with id ${id}!`);
 
-                return result.delete();
+                return result.delete()
+                    .then(status => {
+                        WrongIdError.assert(status, `Cant delete auth with id ${id}!`);
+                        res.json(result);
+                    });
             })
-            .then(() => res.send(true))
             .catch(next);
     }
 );

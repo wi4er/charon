@@ -51,8 +51,20 @@ class Environment {
         return process.env.USE_SSL;
     }
 
+    get USER_HOST() {
+        return process.env.USER_HOST || "localhost"
+    }
+
+    get USER_PORT() {
+        return process.env.USER_PORT || "8081"
+    }
+
     get SECRET() {
         return process.env.SECRET || "hello world !";
+    }
+
+    get ACCESS_TOKEN() {
+        return process.env.ACCESS_TOKEN || "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImlhdCI6MTY1Mzg3NDAxM30.PDa_NPahbV8-xPlb4djOuQLr-xpMBvs8-LXiV-bzdZU";
     }
 
     get DEFAULT_PUBLIC_GROUP() {
@@ -60,7 +72,7 @@ class Environment {
     }
 
     get ENABLE_PUBLIC_USER() {
-        return !!process.env.ENABLE_PUBLIC_USER;
+        return process.env.ENABLE_PUBLIC_USER || true;
     }
 }
 

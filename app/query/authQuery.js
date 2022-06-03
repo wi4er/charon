@@ -4,6 +4,11 @@ const filterList = {
     },
 }
 
+const sortList = {
+
+};
+
 module.exports = {
     parseFilter: require("./filterParser")(filterList),
+    parseSort: require("./sortParser")(sortList),
 };

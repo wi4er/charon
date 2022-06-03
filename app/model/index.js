@@ -1,75 +1,39 @@
 const mongoose = require("mongoose");
-const env = require("../../environment");
+const getConnectionUrl = require("./connection/getConnectionUrl");
+const getConnectionOptions = require("./connection/getConnectionOptions");
 
-class Model {
-    connection = null;
+let connection = null;
 
-    constructor() {
-        const res = this.createConnection.bind(this)
-        res.disconnect = this.disconnect.bind(this);
-        res.connect = this.connect.bind(this);
-        res.clearDatabase = this.clearDatabase.bind(this);
-
-        return res;
-    }
-
-    getConnectionUrl() {
-        if (env.DB_URL) {
-            return env.DB_URL;
-        }
-
-        return [
-            "mongodb://",
-            env.DB_USER,
-            ":",
-            env.DB_PASSWORD,
-            "@",
-            env.DB_HOST,
-            ":",
-            env.DB_PORT,
-            "/",
-            env.DB_NAME,
-        ].join("");
-    }
-
-    getConnectionOptions() {
-        const options = {};
-
-        if (env.USE_SSL) {
-            options.ssl = true;
-            options.sslCA = env.USE_SSL;
-        }
-
-        return options;
-    }
-
-    connect() {
-        if (!this.connection) {
-            return mongoose.connect(this.getConnectionUrl(), this.getConnectionOptions())
-                .then(conn => this.connection = conn)
-
-        } else {
-            return Promise.resolve(this.connection);
-        }
-    }
-
-    disconnect() {
-        return this.connection?.close?.();
-    }
-
-    async clearDatabase() {
-        const coll = Object.values(mongoose.connection.collections);
-
-        for (const item of coll) {
-            await item.deleteMany({});
-        }
-    }
-
-    createConnection(req, res, next) {
-        this.connect()
-            .then(() => next())
-            .catch(err => next(err));
+function connect() {
+    if (!connection) {
+        return mongoose.connect(getConnectionUrl(), getConnectionOptions())
+            .then(conn => connection = conn);
+    } else {
+        return Promise.resolve(connection);
     }
 }
 
-module.exports = new Model();
+function disconnect() {
+    return this.connection?.close?.();
+}
+
+function createConnection(req, res, next) {
+    connect()
+        .then(() => next())
+        .catch(err => next(err));
+}
+
+async function clearDatabase() {
+    const coll = Object.values(mongoose.connection.collections);
+
+    for (const item of coll) {
+        await item.deleteMany({});
+    }
+}
+
+module.exports = {
+    connect,
+    disconnect,
+    clearDatabase,
+    createConnection,
+};
