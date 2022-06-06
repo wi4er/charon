@@ -5,7 +5,7 @@ const PermissionError = require("../exception/PermissionError");
 const createToken = require("../permission/createToken");
 const WrongRefError = require("../exception/WrongRefError");
 const env = require("../../environment");
-const {postUser} = require("../fetch/fetchUser");
+const {postUser, fetchUser} = require("../fetch/fetchUser");
 
 router.get(
     "/public/",
@@ -26,8 +26,12 @@ router.get(
 router.get(
     "/password/",
     (req, res, next) => {
-        // const {headers: {contact, password}} = req;
-        //
+        const {headers: {contact, password}} = req;
+
+        Hash.findOne({})
+
+        fetchUser()
+            .then()
         // User.findOne({"contact.value": contact})
         //     .then(user => {
         //         PermissionError.assert(user, "Wrong user data!");

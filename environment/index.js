@@ -12,35 +12,35 @@ class Environment {
      * Пользователь базы данных
      */
     get DB_USER() {
-        return process.env.DB_USER || "pass";
+        return process.env.DB_USER;
     }
 
     /**
      * Пароль для базы данных
      */
     get DB_PASSWORD() {
-        return process.env.DB_PASSWORD || "example";
+        return process.env.DB_PASSWORD;
     }
 
     /**
      * Хост для базы данных
      */
     get DB_HOST() {
-        return process.env.DB_HOST || "localhost";
+        return process.env.DB_HOST;
     }
 
     /**
      * Порт базы данных
      */
     get DB_PORT() {
-        return process.env.DB_PORT || "27017";
+        return process.env.DB_PORT;
     }
 
     /**
      * Имя базы данных
      */
     get DB_NAME() {
-        return process.env.DB_NAME || "pass";
+        return process.env.DB_NAME;
     }
 
     get DB_URL() {
@@ -52,19 +52,19 @@ class Environment {
     }
 
     get USER_HOST() {
-        return process.env.USER_HOST || "localhost"
+        return process.env.USER_HOST;
     }
 
     get USER_PORT() {
-        return process.env.USER_PORT || "8081"
+        return process.env.USER_PORT;
     }
 
     get SECRET() {
-        return process.env.SECRET || "hello world !";
+        return process.env.SECRET;
     }
 
     get ACCESS_TOKEN() {
-        return process.env.ACCESS_TOKEN || "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImlhdCI6MTY1Mzg3NDAxM30.PDa_NPahbV8-xPlb4djOuQLr-xpMBvs8-LXiV-bzdZU";
+        return process.env.ACCESS_TOKEN;
     }
 
     get DEFAULT_PUBLIC_GROUP() {
@@ -72,7 +72,7 @@ class Environment {
     }
 
     get ENABLE_PUBLIC_USER() {
-        return process.env.ENABLE_PUBLIC_USER || true;
+        return !!process.env.ENABLE_PUBLIC_USER;
     }
 }
 

@@ -16,11 +16,13 @@ try {
     app.use(require("./exception"));
 
     module.exports = app;
-} catch (e) {
+} catch (err) {
     module.exports = (req, res) => {
         res.statusCode = 500;
         res.setHeader('Content-Type', 'application/json');
-        res.write(JSON.stringify({message: e.message}));
+        res.write(JSON.stringify({message: err.message}));
         res.end();
+
+        console.error(err);
     }
 }

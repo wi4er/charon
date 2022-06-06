@@ -45,7 +45,7 @@ function postUser(user) {
             let data = "";
 
             res.on('data', d => data += d);
-            res.on("end", () => resolve(data));
+            res.on("end", () => resolve(JSON.parse(data)));
         });
 
         req.write(JSON.stringify(user));

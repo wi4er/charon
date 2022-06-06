@@ -3,7 +3,23 @@ const app = require("..");
 const createToken = require("../permission/createToken");
 const jwt = require("jsonwebtoken");
 
-afterEach(() => require("../model").clearDatabase());
+afterEach(() => require("../test/clearDatabase")());
+afterEach(() => require("../test/clearUserDatabase")());
+
+const env = {
+    DB_USER: "pass",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_PORT: "27017",
+    DB_NAME: "pass",
+    SECRET: "hello world!",
+    ENABLE_PUBLIC_USER: "1",
+    ACCESS_TOKEN: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiYWRtaW4iOnRydWUsImlhdCI6MTY1Mzg3NDAxM30.PDa_NPahbV8-xPlb4djOuQLr-xpMBvs8-LXiV-bzdZU",
+    USER_HOST: "localhost",
+    USER_PORT: "8081",
+};
+
+jest.mock("../../environment", () => env);
 
 describe("Auth endpoint", function () {
     describe("Auth getting by contact", () => {
@@ -11,13 +27,13 @@ describe("Auth endpoint", function () {
             await request(app)
                 .post("/contact/")
                 .send({_id: "PHONE"})
-                .set(...require("./mock/auth"))
+                .set(...require("./mock/auth")())
                 .expect(201);
 
             const user = await request(app)
                 .post("/user/")
                 .send({contact: [{contact: "PHONE", value: "123"}]})
-                .set(...require("./mock/auth"))
+                .set(...require("./mock/auth")())
                 .expect(201)
                 .then(response => response.body);
 
@@ -135,7 +151,7 @@ describe("Auth endpoint", function () {
         });
 
         test("Shouldn't get token without contact", async () => {
-           await request(app)
+            await request(app)
                 .post("/user/")
                 .set(...require("./mock/auth"))
                 .expect(201);
@@ -337,33 +353,17 @@ describe("Auth endpoint", function () {
     });
 });
 
-jest.mock("../../environment", () => {
-    const inst = jest.requireActual("../../environment");
-    const created = Object.create(inst);
-
-    Object.defineProperty(
-        created,
-        "DEFAULT_GROUP",
-        {get: () => "6".repeat(24)}
-    );
-
-    return created;
-});
-
-describe("Public endpoint", function () {
+describe("Public endpoint", () => {
     describe("Public token getting", () => {
         test("Should get token", async () => {
             await request(app)
                 .get("/token/public/")
                 .expect(200)
                 .then(res => {
-                    console.log(res.text);
-                    
-                    
-                    // const payload = jwt.decode(resp.text.slice(7));
-                    //
-                    // expect(payload.id.length).toBe(24);
-                    // expect(payload.group).toEqual(["6".repeat(24)]);
+                    const token = jwt.decode(res.body.authorization.slice(7))
+
+                    expect(token.id.length).toBe(24);
+                    expect(token.admin).toBe(false);
                 });
         });
 
@@ -372,7 +372,7 @@ describe("Public endpoint", function () {
                 .get("/token/public/")
                 .expect(200)
                 .then(res => {
-                    expect(res.text.length).toBe(188);
+                    expect(res.text.length).toBe(194);
                 });
         });
     });

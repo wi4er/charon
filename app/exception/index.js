@@ -1,5 +1,6 @@
 const {Error: {ValidationError}, Error} = require("mongoose");
-const {MongoServerError} = require("mongodb")
+const {MongoServerError} = require("mongodb");
+const {UnauthorizedError} = require("express-jwt");
 
 function formatError(err) {
     return {
@@ -9,7 +10,7 @@ function formatError(err) {
 
 module.exports = (err, req, res, next) => {
     console.log(err);
-    
+
     switch (err.constructor) {
         case ValidationError: {
             res.status(400);
