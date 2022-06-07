@@ -12,3 +12,23 @@ user.createUser(
         ]
     }
 );
+
+user.runCommand(
+    {
+        insert: "uniq",
+        documents: [{
+            _id: "EMAIL",
+            timestamp: new Date(),
+        }]
+    }
+);
+
+user.runCommand(
+    {
+        insert: "uniq",
+        documents: [{
+            _id: "PHONE",
+            timestamp: new Date(),
+        }]
+    }
+);

@@ -2,12 +2,30 @@ const env = require("../../environment");
 const jwt = require("jsonwebtoken");
 const http = require('http');
 
-function fetchUser(userId) {
+
+const filterConfig = {
+    uniq: value => {
+        return `filter=uniq-in-${value}`
+    }
+}
+
+function formatFilter(filter) {
+    const res = [];
+
+    for (const item in filter) {
+        res.push(filterConfig[item](filter[item]));
+    }
+
+    return res.join("&")
+    // return filter.map(item => filterConfig[item]()).join("&");
+}
+
+function fetchUser(filter) {
     return new Promise(resolve => {
         const options = {
             hostname: env.USER_HOST,
             port: +env.USER_PORT,
-            path: `/content/?filter=field-id-in-${userId}`,
+            path: `/content/?${formatFilter(filter)}`,
             method: 'GET',
             headers: {
                 'authorization': env.ACCESS_TOKEN,
@@ -18,7 +36,7 @@ function fetchUser(userId) {
             let data = "";
 
             res.on('data', d => data += d);
-            res.on("end", () => resolve(data));
+            res.on("end", () => resolve(JSON.parse(data)));
         });
 
         req.on('error', error => {
@@ -38,6 +56,7 @@ function postUser(user) {
             method: 'POST',
             headers: {
                 'authorization': env.ACCESS_TOKEN,
+                'Content-Type': "Application/json",
             },
         };
 

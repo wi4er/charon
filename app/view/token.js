@@ -6,6 +6,8 @@ const createToken = require("../permission/createToken");
 const WrongRefError = require("../exception/WrongRefError");
 const env = require("../../environment");
 const {postUser, fetchUser} = require("../fetch/fetchUser");
+const {md5} = require("../encode");
+const crypto = require("crypto");
 
 router.get(
     "/public/",
@@ -28,23 +30,20 @@ router.get(
     (req, res, next) => {
         const {headers: {contact, password}} = req;
 
-        Hash.findOne({})
+        PermissionError.assert(contact, "Contact required!");
 
-        fetchUser()
-            .then()
-        // User.findOne({"contact.value": contact})
-        //     .then(user => {
-        //         PermissionError.assert(user, "Wrong user data!");
-        //
-        //         return Hash.findOne({"user": user._id})
-        //             .then(auth => {
-        //                 PermissionError.assert(auth, "Password required!");
-        //                 PermissionError.assert(md5(password) === auth.hash, "Wrong permission data!");
-        //
-        //                 res.send(createToken(user));
-        //             });
-        //     })
-        //     .catch(next);
+        fetchUser({uniq: contact})
+            .then(user => Hash.findOne({user: user[0]._id})
+                .then(hash => {
+                    PermissionError.assert(hash, "Password required!");
+
+                    const target = md5(password, hash.hash.slice(0, 8))
+
+                    PermissionError.assert(target === hash.hash, "Password required!");
+                    res.send({authorization: createToken(user)});
+                })
+            )
+            .catch(next);
     }
 );
 
