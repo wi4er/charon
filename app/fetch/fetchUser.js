@@ -6,6 +6,9 @@ const http = require('http');
 const filterConfig = {
     uniq: value => {
         return `filter=uniq-in-${value}`
+    },
+    id: value => {
+        return `filter=field-id-in-${value}`
     }
 }
 
@@ -22,6 +25,10 @@ function formatFilter(filter) {
 
 function fetchUser(filter) {
     return new Promise(resolve => {
+        
+        console.log(filter);
+        
+        
         const options = {
             hostname: env.USER_HOST,
             port: +env.USER_PORT,

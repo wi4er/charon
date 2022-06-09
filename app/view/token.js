@@ -7,7 +7,6 @@ const WrongRefError = require("../exception/WrongRefError");
 const env = require("../../environment");
 const {postUser, fetchUser} = require("../fetch/fetchUser");
 const {md5} = require("../encode");
-const crypto = require("crypto");
 
 router.get(
     "/public/",
@@ -37,9 +36,7 @@ router.get(
                 .then(hash => {
                     PermissionError.assert(hash, "Password required!");
 
-                    const target = md5(password, hash.hash.slice(0, 8))
-
-                    PermissionError.assert(target === hash.hash, "Password required!");
+                    PermissionError.assert(md5(password, hash.hash.slice(0, 8)) === hash.hash, "Password required!");
                     res.send({authorization: createToken(user)});
                 })
             )
@@ -50,23 +47,21 @@ router.get(
 router.get(
     "/password/:userID/",
     (req, res, next) => {
-        // const {
-        //     headers: {password},
-        //     params: {userID},
-        // } = req;
-        //
-        // User.findById(userID)
-        //     .then(user => {
-        //         PermissionError.assert(user, "Wrong user data!");
-        //
-        //         return Hash.findOne({"auth.user": userID})
-        //             .then(auth => {
-        //                 PermissionError.assert(auth, "User password required!");
-        //                 PermissionError.assert(md5(password) === auth.hash, "Wrong permission data!");
-        //                 res.send(createToken(user));
-        //             });
-        //     })
-        //     .catch(next);
+        const {
+            headers: {password},
+            params: {userID}
+        } = req;
+
+        fetchUser({id: userID})
+            .then(user => Hash.findOne({user: user[0]._id})
+                .then(hash => {
+                    PermissionError.assert(hash, "Password required!");
+
+                    PermissionError.assert(md5(password, hash.hash.slice(0, 8)) === hash.hash, "Password required!");
+                    res.send({authorization: createToken(user)});
+                })
+            )
+            .catch(next);
     }
 );
 
@@ -74,6 +69,23 @@ router.post(
     "/password/",
     // userCheck,
     (req, res, next) => {
+        // const {
+        //     user: {id},
+        //     headers: {password}
+        // } = req;
+        //
+        // Hash.findOne({user:id})
+        //     .then(hash => {
+        //         WrongRefError.assert(!hash, "Password already exists");
+        //
+        //         return new Hash({
+        //             user: id,
+        //             hash: md5(password),
+        //         }).save();
+        //     })
+        //     .catch(next);
+
+
         // Auth.findOne({
         //     "user": req.user.id,
         // })

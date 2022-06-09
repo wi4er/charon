@@ -32,199 +32,204 @@ describe("Token endpoint", function () {
             const user = await postUser({
                 uniq: [{
                     uniq: "EMAIL",
-                    value: "123",
+                    value: "user@mail.com",
                 }]
             });
 
-            const hash = await new Hash({
-                user: user._id,
-                hash: "12345678c543e3107845db15c9c7206e8b494827",
-                algorithm: "md5",
-            }).save();
+            await request(app)
+                .post("/auth/")
+                .send({
+                    user: user._id,
+                    hash: "12345678c543e3107845db15c9c7206e8b494827",
+                    algorithm: "md5",
+                })
+                .set(...require("./mock/auth")())
+                .expect(201);
 
             await request(app)
                 .get("/token/password/")
-                .set("contact", "123")
+                .set("contact", "user@mail.com")
                 .set("password", "12345")
                 .expect(200)
                 .then(res => {
-                    console.log(res.body);
-                    
-                    
-                    // expect(res.text.length).toBe(188);
+                    expect(res.body.authorization.length).toBe(131);
                 });
         });
 
-        test("Should get token from many users", async () => {
-            await request(app)
-                .post("/contact/")
-                .send({_id: "PHONE"})
-                .set(...require("./mock/auth"))
-                .expect(201);
+        // test("Should get token from many users", async () => {
+        //     await request(app)
+        //         .post("/contact/")
+        //         .send({_id: "PHONE"})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201);
+        //
+        //     await request(app)
+        //         .post("/user/")
+        //         .send({contact: [{contact: "PHONE", value: "WRONG"}]})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201)
+        //         .then(response => response.body);
+        //
+        //     const user = await request(app)
+        //         .post("/user/")
+        //         .send({contact: [{contact: "PHONE", value: "123"}]})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201)
+        //         .then(response => response.body);
+        //
+        //     await request(app)
+        //         .post("/user/")
+        //         .send({contact: [{contact: "PHONE", value: "ANOTHER"}]})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201)
+        //         .then(response => response.body);
+        //
+        //     await request(app)
+        //         .post("/auth/")
+        //         .send({
+        //             user: user._id,
+        //             hash: "d8578edf8458ce06fbc5bb76a58c5ca4"
+        //         })
+        //         .set(...require("./mock/auth"));
+        //
+        //     await request(app)
+        //         .get("/token/password/")
+        //         .set("contact", "123")
+        //         .set("password", "qwerty")
+        //         .expect(200)
+        //         .then(res => {
+        //             expect(res.text.length).toBe(188);
+        //         });
+        // });
+        //
+        // test("Shouldn't get token with wrong password", async () => {
+        //     await request(app)
+        //         .post("/contact/")
+        //         .send({_id: "PHONE"})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201);
+        //
+        //     const user = await request(app)
+        //         .post("/user/")
+        //         .send({contact: [{contact: "PHONE", value: "123"}]})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201)
+        //         .then(response => response.body);
+        //
+        //     await request(app)
+        //         .post("/auth/")
+        //         .send({
+        //             user: user._id,
+        //             hash: "d8578edf8458ce06fbc5bb76a58c5ca4"
+        //         })
+        //         .set(...require("./mock/auth"));
+        //
+        //     await request(app)
+        //         .get("/token/password/")
+        //         .set("contact", "123")
+        //         .set("password", "wrong")
+        //         .expect(403);
+        // });
+        //
+        // test("Shouldn't get token without password", async () => {
+        //     await request(app)
+        //         .post("/contact/")
+        //         .send({_id: "PHONE"})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201);
+        //
+        //     await request(app)
+        //         .post("/user/")
+        //         .send({contact: [{contact: "PHONE", value: "123"}]})
+        //         .set(...require("./mock/auth"))
+        //         .expect(201)
+        //
+        //     await request(app)
+        //         .get("/token/password/")
+        //         .set("contact", "123")
+        //         .set("password", "qwerty")
+        //         .expect(403);
+        // });
+        //
+        // test("Shouldn't get token without contact", async () => {
+        //     await request(app)
+        //         .post("/user/")
+        //         .set(...require("./mock/auth"))
+        //         .expect(201);
+        //
+        //     await request(app)
+        //         .get("/token/password/")
+        //         .set("contact", "123")
+        //         .set("password", "qwerty")
+        //         .expect(403);
+        // });
+        //
+        // test("Shouldn't get token without user", async () => {
+        //     await request(app)
+        //         .get("/token/password/")
+        //         .set("contact", "123")
+        //         .set("password", "qwerty")
+        //         .expect(403);
+        // });
+    });
 
-            await request(app)
-                .post("/user/")
-                .send({contact: [{contact: "PHONE", value: "WRONG"}]})
-                .set(...require("./mock/auth"))
-                .expect(201)
-                .then(response => response.body);
-
-            const user = await request(app)
-                .post("/user/")
-                .send({contact: [{contact: "PHONE", value: "123"}]})
-                .set(...require("./mock/auth"))
-                .expect(201)
-                .then(response => response.body);
-
-            await request(app)
-                .post("/user/")
-                .send({contact: [{contact: "PHONE", value: "ANOTHER"}]})
-                .set(...require("./mock/auth"))
-                .expect(201)
-                .then(response => response.body);
+    describe("Auth getting by id", () => {
+        test("Should get token", async () => {
+            const user = await postUser({});
 
             await request(app)
                 .post("/auth/")
                 .send({
                     user: user._id,
-                    hash: "d8578edf8458ce06fbc5bb76a58c5ca4"
+                    hash: "12345678c543e3107845db15c9c7206e8b494827",
+                    algorithm: "md5",
                 })
-                .set(...require("./mock/auth"));
+                .set(...require("./mock/auth")())
+                .expect(201);
 
             await request(app)
-                .get("/token/password/")
-                .set("contact", "123")
-                .set("password", "qwerty")
+                .get(`/token/password/${user._id}/`)
+                .set("password", "12345")
                 .expect(200)
                 .then(res => {
-                    expect(res.text.length).toBe(188);
+                    expect(res.body.authorization.length).toBe(131);
                 });
         });
 
-        test("Shouldn't get token with wrong password", async () => {
-            await request(app)
-                .post("/contact/")
-                .send({_id: "PHONE"})
-                .set(...require("./mock/auth"))
-                .expect(201);
-
-            const user = await request(app)
-                .post("/user/")
-                .send({contact: [{contact: "PHONE", value: "123"}]})
-                .set(...require("./mock/auth"))
-                .expect(201)
-                .then(response => response.body);
+        test("Shouldn't get token without password", async () => {
+            const user = await postUser({});
 
             await request(app)
                 .post("/auth/")
                 .send({
                     user: user._id,
-                    hash: "d8578edf8458ce06fbc5bb76a58c5ca4"
+                    hash: "12345678c543e3107845db15c9c7206e8b494827",
+                    algorithm: "md5",
                 })
-                .set(...require("./mock/auth"));
+                .set(...require("./mock/auth")())
+                .expect(201);
 
             await request(app)
-                .get("/token/password/")
-                .set("contact", "123")
+                .get(`/token/password/${user._id}/`)
                 .set("password", "wrong")
                 .expect(403);
         });
 
-        test("Shouldn't get token without password", async () => {
+        test("Shouldn't get token with user id", async () => {
             await request(app)
-                .post("/contact/")
-                .send({_id: "PHONE"})
-                .set(...require("./mock/auth"))
-                .expect(201);
-
-            await request(app)
-                .post("/user/")
-                .send({contact: [{contact: "PHONE", value: "123"}]})
-                .set(...require("./mock/auth"))
-                .expect(201)
-
-            await request(app)
-                .get("/token/password/")
-                .set("contact", "123")
+                .get(`/token/password/123/`)
                 .set("password", "qwerty")
-                .expect(403);
-        });
-
-        test("Shouldn't get token without contact", async () => {
-            await request(app)
-                .post("/user/")
-                .set(...require("./mock/auth"))
-                .expect(201);
-
-            await request(app)
-                .get("/token/password/")
-                .set("contact", "123")
-                .set("password", "qwerty")
-                .expect(403);
+                .expect(500);
         });
 
         test("Shouldn't get token without user", async () => {
             await request(app)
-                .get("/token/password/")
-                .set("contact", "123")
+                .get(`/token/password/111112222233333444445555/`)
                 .set("password", "qwerty")
                 .expect(403);
         });
     });
-    //
-    // describe("Auth getting by id", () => {
-    //     test("Should get token", async () => {
-    //         const user = await request(app)
-    //             .post("/user/")
-    //             .set(...require("./mock/auth"))
-    //             .expect(201)
-    //             .then(response => response.body);
-    //
-    //         await request(app)
-    //             .post("/auth/")
-    //             .send({
-    //                 user: user._id,
-    //                 hash: "d8578edf8458ce06fbc5bb76a58c5ca4"
-    //             })
-    //             .set(...require("./mock/auth"));
-    //
-    //         await request(app)
-    //             .get(`/token/password/${user._id}/`)
-    //             .set("password", "qwerty")
-    //             .expect(200)
-    //             .then(res => {
-    //                 expect(res.text.length).toBe(188);
-    //             });
-    //     });
-    //
-    //     test("Shouldn't get token without password", async () => {
-    //         const user = await request(app)
-    //             .post("/user/")
-    //             .set(...require("./mock/auth"))
-    //             .expect(201)
-    //             .then(response => response.body);
-    //
-    //         await request(app)
-    //             .get(`/token/password/${user._id}/`)
-    //             .set("password", "qwerty")
-    //             .expect(403);
-    //     });
-    //
-    //     test("Shouldn't get token with user id", async () => {
-    //         await request(app)
-    //             .get(`/token/password/123/`)
-    //             .set("password", "qwerty")
-    //             .expect(500);
-    //     });
-    //
-    //     test("Shouldn't get token without user", async () => {
-    //         await request(app)
-    //             .get(`/token/password/111112222233333444445555/`)
-    //             .set("password", "qwerty")
-    //             .expect(403);
-    //     });
-    // });
-    //
+
     // describe("Password managing", () => {
     //     test("Shouldn't add password without token", async () => {
     //         await request(app)
