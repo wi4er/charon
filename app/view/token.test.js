@@ -132,26 +132,26 @@ describe("Token endpoint", function () {
                 .expect(403);
         });
 
-        // test("Shouldn't get token without contact", async () => {
-        //     await request(app)
-        //         .post("/user/")
-        //         .set(...require("./mock/auth"))
-        //         .expect(201);
-        //
-        //     await request(app)
-        //         .get("/token/password/")
-        //         .set("contact", "123")
-        //         .set("password", "qwerty")
-        //         .expect(403);
-        // });
-        //
-        // test("Shouldn't get token without user", async () => {
-        //     await request(app)
-        //         .get("/token/password/")
-        //         .set("contact", "123")
-        //         .set("password", "qwerty")
-        //         .expect(403);
-        // });
+        test("Shouldn't get token without contact", async () => {
+            await request(app)
+                .post("/user/")
+                .set(...require("./mock/auth"))
+                .expect(201);
+
+            await request(app)
+                .get("/token/password/")
+                .set("contact", "123")
+                .set("password", "qwerty")
+                .expect(403);
+        });
+
+        test("Shouldn't get token without user", async () => {
+            await request(app)
+                .get("/token/password/")
+                .set("contact", "123")
+                .set("password", "qwerty")
+                .expect(500);
+        });
     });
 
     describe("Auth getting by id", () => {
