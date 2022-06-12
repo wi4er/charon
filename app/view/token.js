@@ -6,7 +6,7 @@ const createToken = require("../permission/createToken");
 const WrongRefError = require("../exception/WrongRefError");
 const env = require("../../environment");
 const {postUser, fetchUser} = require("../fetch/fetchUser");
-const {md5} = require("../encode");
+const encode = require("../encode");
 
 router.get(
     "/public/",
@@ -32,14 +32,16 @@ router.get(
         PermissionError.assert(contact, "Contact required!");
 
         fetchUser({uniq: contact})
-            .then(user => Hash.findOne({user: user[0]._id})
-                .then(hash => {
-                    PermissionError.assert(hash, "Password required!");
+            .then(async user => {
+                const hash = await Hash.findOne({user: user[0]._id})
+                PermissionError.assert(hash, "Password required!");
 
-                    PermissionError.assert(md5(password, hash.hash.slice(0, 8)) === hash.hash, "Password required!");
-                    res.send({authorization: createToken(user)});
-                })
-            )
+                PermissionError.assert(
+                    encode.encrypt(password, hash.hash.slice(0, 8), hash.algorithm) === hash.hash,
+                    "Wrong password!"
+                );
+                res.send({authorization: createToken(user)});
+            })
             .catch(next);
     }
 );
@@ -53,14 +55,16 @@ router.get(
         } = req;
 
         fetchUser({id: userID})
-            .then(user => Hash.findOne({user: user[0]._id})
-                .then(hash => {
-                    PermissionError.assert(hash, "Password required!");
+            .then(async user => {
+                const hash = await Hash.findOne({user: user[0]._id})
+                PermissionError.assert(hash, "Password required!");
 
-                    PermissionError.assert(md5(password, hash.hash.slice(0, 8)) === hash.hash, "Password required!");
-                    res.send({authorization: createToken(user)});
-                })
-            )
+                PermissionError.assert(
+                    encode.encrypt(password, hash.hash.slice(0, 8), hash.algorithm) === hash.hash,
+                    "Wrong password!"
+                );
+                res.send({authorization: createToken(user)});
+            })
             .catch(next);
     }
 );

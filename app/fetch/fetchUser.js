@@ -15,6 +15,9 @@ const filterConfig = {
 function formatFilter(filter) {
     const res = [];
 
+    console.log(filter);
+    
+    
     for (const item in filter) {
         res.push(filterConfig[item](filter[item]));
     }
@@ -25,10 +28,6 @@ function formatFilter(filter) {
 
 function fetchUser(filter) {
     return new Promise(resolve => {
-        
-        console.log(filter);
-        
-        
         const options = {
             hostname: env.USER_HOST,
             port: +env.USER_PORT,
