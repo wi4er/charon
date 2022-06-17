@@ -1,12 +1,10 @@
 const request = require("supertest");
 const app = require("..");
-const createToken = require("../permission/createToken");
 const jwt = require("jsonwebtoken");
 const {postUser} = require("../fetch/fetchUser");
-const Hash = require("../model/Hash");
 
-afterEach(() => require("../test/clearDatabase")());
-afterEach(() => require("../test/clearUserDatabase")());
+afterEach(() => require("../../test/clearDatabase")());
+afterEach(() => require("../../test/clearUserDatabase")());
 beforeAll(() => require("../model/connection/connect")());
 afterAll(() => require("../model/connection/connect").disconnect());
 

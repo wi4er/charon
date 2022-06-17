@@ -87,14 +87,13 @@ router.delete(
         const {params: {id}} = req;
 
         Hash.findById(id)
-            .then(result => {
-                WrongIdError.assert(result, `Cant delete auth with id ${id}!`);
+            .then(async hash => {
+                WrongIdError.assert(hash, `Cant delete hash with id ${id}!`);
 
-                return result.delete()
-                    .then(status => {
-                        WrongIdError.assert(status, `Cant delete auth with id ${id}!`);
-                        res.json(result);
-                    });
+                const status = await result.delete();
+                WrongIdError.assert(status, `Cant delete hash with id ${id}!`);
+
+                res.json(hash);
             })
             .catch(next);
     }

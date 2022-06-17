@@ -1,6 +1,6 @@
 const Hash = require("./Hash");
 
-afterEach(() => require("../test/clearDatabase")());
+afterEach(() => require("../../test/clearDatabase")());
 beforeAll(() => require("./connection/connect")());
 afterAll(() => require("./connection/connect").disconnect());
 

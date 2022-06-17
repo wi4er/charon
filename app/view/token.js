@@ -5,7 +5,8 @@ const PermissionError = require("../exception/PermissionError");
 const createToken = require("../permission/createToken");
 const WrongRefError = require("../exception/WrongRefError");
 const env = require("../../environment");
-const {postUser, fetchUser} = require("../fetch/fetchUser");
+const fetchUser = require("../fetch/fetchUser");
+const postUser = require("../fetch/postUser");
 const encode = require("../encode");
 
 router.get(

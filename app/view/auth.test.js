@@ -1,8 +1,8 @@
 const request = require("supertest");
 const app = require("..");
 
-afterEach(() => require("../test/clearDatabase")());
-afterEach(() => require("../test/clearUserDatabase")());
+afterEach(() => require("../../test/clearDatabase")());
+afterEach(() => require("../../test/clearUserDatabase")());
 
 const env = {
     DB_USER: "pass",

@@ -1,7 +1,7 @@
-const {fetchUser} = require("./fetchUser");
+const fetchUser = require("./fetchUser");
 
-afterEach(() => require("../test/clearDatabase")());
-afterEach(() => require("../test/clearUserDatabase")());
+afterEach(() => require("../../test/clearDatabase")());
+afterEach(() => require("../../test/clearUserDatabase")());
 
 const env = {
     DB_USER: "pass",
