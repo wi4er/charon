@@ -34,6 +34,8 @@ router.get(
 
         fetchUser({uniq: contact})
             .then(async user => {
+                PermissionError.assert(user.length, "Wrong user required!");
+
                 const hash = await Hash.findOne({user: user[0]._id})
                 PermissionError.assert(hash, "Password required!");
 
@@ -64,6 +66,7 @@ router.get(
                     encode.encrypt(password, hash.hash.slice(0, 8), hash.algorithm) === hash.hash,
                     "Wrong password!"
                 );
+
                 res.send({authorization: createToken(user)});
             })
             .catch(next);
@@ -74,40 +77,25 @@ router.post(
     "/password/",
     // userCheck,
     (req, res, next) => {
-        // const {
-        //     user: {id},
-        //     headers: {password}
-        // } = req;
-        //
-        // Hash.findOne({user:id})
-        //     .then(hash => {
-        //         WrongRefError.assert(!hash, "Password already exists");
-        //
-        //         return new Hash({
-        //             user: id,
-        //             hash: md5(password),
-        //         }).save();
-        //     })
-        //     .catch(next);
+        const {
+            user: {id},
+            headers: {password}
+        } = req;
+        
+        Hash.findOne({user: id})
+            .then(async hash => {
+                await new Hash({
+                    user: id,
+                    hash: encode.encrypt(password, "12345678", "md5"),
+                    algorithm: "md5",
+                }).save();
 
+                const user = await fetchUser({id});
+                
+                res.send({authorization: createToken(user)});
 
-        // Auth.findOne({
-        //     "user": req.user.id,
-        // })
-        //     .then(item => {
-        //         WrongRefError.assert(!item, "Password already exists");
-        //
-        //         return new Hash({
-        //             user: req.user.id,
-        //             hash: md5(req.headers.password),
-        //         }).save();
-        //     })
-        //     .then(item => User.findById(item.user))
-        //     .then(user => {
-        //         res.status(201);
-        //         res.send(createToken(user));
-        //     })
-        //     .catch(next);
+            })
+            .catch(next);
     }
 );
 
@@ -136,16 +124,18 @@ router.delete(
     "/password/",
     // userCheck,
     (req, res, next) => {
-        // Hash.findOne({
-        //     "user": req.user.id,
-        // })
-        //     .then(item => {
-        //         WrongRefError.assert(item, "Password don't exists");
-        //         return item.delete();
-        //     })
-        //     .then(item => User.findById(item.user))
-        //     .then(user => res.send(createToken(user)))
-        //     .catch(next);
+        const {user: {id}} = req;
+
+        Hash.findOne({
+            "user": id,
+        })
+            .then(item => {
+                WrongRefError.assert(item, "Password don't exists");
+                return item.delete();
+            })
+            .then(item => fetchUser({id: item.user}))
+            .then(user => res.send(createToken(user)))
+            .catch(next);
     }
 );
 

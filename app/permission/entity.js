@@ -1,4 +1,4 @@
 module.exports = {
-    AUTH: "AUTH",
+    HASH: "HASH",
     PERMISSION: "PERMISSION",
 };

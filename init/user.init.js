@@ -19,6 +19,7 @@ user.runCommand(
         documents: [{
             _id: "EMAIL",
             timestamp: new Date(),
+            created: new Date(),
         }]
     }
 );
@@ -29,6 +30,7 @@ user.runCommand(
         documents: [{
             _id: "PHONE",
             timestamp: new Date(),
+            created: new Date(),
         }]
     }
 );

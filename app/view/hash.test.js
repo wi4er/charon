@@ -15,11 +15,11 @@ const env = {
 
 jest.mock("../../environment", () => env);
 
-describe("Auth endpoint", () => {
-    describe("Auth fields", () => {
+describe("Hash endpoint", () => {
+    describe("Hash fields", () => {
         test("Should get list", async () => {
             await request(app)
-                .get("/auth/")
+                .get("/hash/")
                 .set(...require("./mock/auth")())
                 .expect(200)
                 .expect(res => expect(res.body).toEqual([]));
@@ -27,7 +27,7 @@ describe("Auth endpoint", () => {
 
         test("Should post item", async () => {
             await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .set(...require("./mock/auth")())
                 .send({
                     user: "123",
@@ -44,7 +44,7 @@ describe("Auth endpoint", () => {
 
         test("Should update item", async () => {
             const id = await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .set(...require("./mock/auth")())
                 .send({
                     user: "123",
@@ -55,7 +55,7 @@ describe("Auth endpoint", () => {
                 .then(res => res.body._id);
 
             await request(app)
-                .put(`/auth/${id}/`)
+                .put(`/hash/${id}/`)
                 .set(...require("./mock/auth")())
                 .send({
                     _id: id,
@@ -73,7 +73,7 @@ describe("Auth endpoint", () => {
 
         test("Should delete item", async () => {
             const id = await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .set(...require("./mock/auth")())
                 .send({
                     user: "123",
@@ -84,7 +84,7 @@ describe("Auth endpoint", () => {
                 .then(res => res.body._id);
 
             await request(app)
-                .delete(`/auth/${id}/`)
+                .delete(`/hash/${id}/`)
                 .set(...require("./mock/auth")())
                 .expect(200)
                 .then(res => {

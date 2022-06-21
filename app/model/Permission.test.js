@@ -1,14 +1,38 @@
 const Permission = require("./Permission");
 
-afterEach(() => require(".").clearDatabase());
-beforeAll(() => require(".").connect());
-afterAll(() => require(".").disconnect());
+afterEach(() => require("../../test/clearDatabase")());
+beforeAll(() => require("./connection/connect")());
+afterAll(() => require("./connection/connect").disconnect());
 
-describe("Property entity", () => {
-    describe("Property addition", () => {
-        test("Should create group", async () => {
+jest.mock("../../environment", () => ({
+    DB_USER: "pass",
+    DB_PASSWORD: "example",
+    DB_HOST: "localhost",
+    DB_PORT: "27017",
+    DB_NAME: "pass",
+    ENABLE_PUBLIC_USER: "1",
+}));
+
+describe("Permission entity", () => {
+    describe("Permission fields", () => {
+        test("Should update dates", async () => {
+            const inst = await new Permission({
+                entity: "HASH",
+                method: "GET",
+                group: 1,
+            }).save();
+
+            const {timestamp, created} = inst;
+            inst.created = new Date();
+            await inst.save();
+
+            expect(inst.timestamp).not.toBe(timestamp);
+            expect(inst.created).toBe(created);
+        });
+
+        test("Should create permission for group", async () => {
             await new Permission({
-                entity: "CONTENT",
+                entity: "HASH",
                 method: "GET",
                 group: 1,
             }).save();

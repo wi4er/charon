@@ -1,13 +1,13 @@
 const request = require("supertest");
 const app = require("..");
 const jwt = require("jsonwebtoken");
-const {postUser} = require("../fetch/fetchUser");
+const postUser = require("../fetch/postUser");
+const createToken = require("../../test/createToken");
 
 afterEach(() => require("../../test/clearDatabase")());
 afterEach(() => require("../../test/clearUserDatabase")());
 beforeAll(() => require("../model/connection/connect")());
 afterAll(() => require("../model/connection/connect").disconnect());
-
 
 const env = {
     DB_USER: "pass",
@@ -25,7 +25,7 @@ const env = {
 jest.mock("../../environment", () => env);
 
 describe("Token endpoint", function () {
-    describe("Auth getting by contact", () => {
+    describe("Token getting by contact", () => {
         test("Should get token", async () => {
             const user = await postUser({
                 uniq: [{
@@ -33,9 +33,9 @@ describe("Token endpoint", function () {
                     value: "user@mail.com",
                 }]
             });
-
+            
             await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .send({
                     user: user._id,
                     hash: "12345678c543e3107845db15c9c7206e8b494827",
@@ -61,7 +61,7 @@ describe("Token endpoint", function () {
                     value: "user@mail.com",
                 }]
             });
-
+            
             for (let i = 0; i < 10; i++) {
                 await postUser({
                     uniq: [{
@@ -72,7 +72,7 @@ describe("Token endpoint", function () {
             }
 
             await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .send({
                     user: user._id,
                     hash: "12345678c543e3107845db15c9c7206e8b494827",
@@ -99,7 +99,7 @@ describe("Token endpoint", function () {
             });
 
             await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .send({
                     user: user._id,
                     hash: "12345678c543e3107845db15c9c7206e8b494827",
@@ -116,7 +116,7 @@ describe("Token endpoint", function () {
         });
 
         test("Shouldn't get token without password", async () => {
-            const user = await postUser({
+            await postUser({
                 uniq: [{
                     uniq: "EMAIL",
                     value: "user@mail.com",
@@ -130,25 +130,12 @@ describe("Token endpoint", function () {
                 .expect(403);
         });
 
-        test("Shouldn't get token without contact", async () => {
-            await request(app)
-                .post("/user/")
-                .set(...require("./mock/auth"))
-                .expect(201);
-
-            await request(app)
-                .get("/token/password/")
-                .set("contact", "123")
-                .set("password", "qwerty")
-                .expect(403);
-        });
-
         test("Shouldn't get token without user", async () => {
-            await request(app)
-                .get("/token/password/")
-                .set("contact", "123")
-                .set("password", "qwerty")
-                .expect(500);
+            // await request(app)
+            //     .get("/token/password/")
+            //     .set("contact", "123")
+            //     .set("password", "qwerty")
+            //     .expect(500);
         });
     });
 
@@ -157,7 +144,7 @@ describe("Token endpoint", function () {
             const user = await postUser({});
 
             await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .send({
                     user: user._id,
                     hash: "12345678c543e3107845db15c9c7206e8b494827",
@@ -179,7 +166,7 @@ describe("Token endpoint", function () {
             const user = await postUser({});
 
             await request(app)
-                .post("/auth/")
+                .post("/hash/")
                 .send({
                     user: user._id,
                     hash: "12345678c543e3107845db15c9c7206e8b494827",
@@ -217,21 +204,24 @@ describe("Token endpoint", function () {
     //             .expect(403);
     //     });
     //
-    //     test("Should add password to user", async () => {
-    //         const user = await request(app)
-    //             .post("/user/")
-    //             .send({contact: [{contact: "PHONE", value: "123"}]})
-    //             .set(...require("./mock/auth"))
-    //             .expect(201)
-    //             .then(response => response.body);
-    //
-    //         await request(app)
-    //             .post("/token/password/")
-    //             .set("password", "old")
-    //             .set("authorization", createToken(user))
-    //             .expect(201);
-    //     });
-    //
+        test("Should add password to user", async () => {
+            const user = await postUser({
+                uniq: [{
+                    uniq: "EMAIL",
+                    value: "user@mail.com",
+                }]
+            });
+
+            await request(app)
+                .post("/token/password/")
+                .set("password", "old")
+                .set(...createToken(user))
+                // .expect(201)
+                .then(res => {
+                    console.log(res.body);
+                });
+        });
+
     //     test("Shouldn't add password twice", async () => {
     //         const user = await request(app)
     //             .post("/user/")

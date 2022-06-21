@@ -18,13 +18,9 @@ const env = {
 jest.mock("../../environment", () => env);
 
 describe("Fetch user", () => {
-    describe("Auth adding", () => {
-        test("Should create", async () => {
-            const user = await fetchUser([]);
-            
-            console.log(user);
-            
-            
-        });
+    test("Should fetch user list", async () => {
+        const list = await fetchUser();
+
+        expect(list).toEqual([]);
     });
 });

@@ -2,6 +2,10 @@ const mongoose = require("mongoose");
 
 const HashSchema = new mongoose.Schema({
     timestamp: Date,
+    created: {
+        type: Date,
+        immutable: true,
+    },
     user: {
         type: String,
         required: true,
@@ -18,9 +22,13 @@ const HashSchema = new mongoose.Schema({
     },
 });
 
-HashSchema.pre("save", next => {
+HashSchema.pre("save", function(next) {
     this.timestamp = new Date();
 
+    if (this.isNew) {
+        this.created = new Date();
+    }
+    
     next();
 });
 

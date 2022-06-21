@@ -2,29 +2,29 @@ const fetch = require("./index");
 
 const filterConfig = {
     uniq: value => {
-        return `filter=uniq-in-${value}`
+        return `filter[uniq][EMAIL][in]=${value}`
     },
     id: value => {
-        return `filter=field-id-in-${value}`
+        return `filter[field][id][in]=${value}`
     }
 }
 
 function formatFilter(filter) {
     const res = [];
 
-    console.log(filter);
-    
-    
+    if (Array.isArray(filter)) {
+        filter = [filter];
+    }
+
     for (const item in filter) {
         res.push(filterConfig[item](filter[item]));
     }
 
     return res.join("&")
-    // return filter.map(item => filterConfig[item]()).join("&");
 }
 
 function fetchUser(filter) {
-    return fetch.post(
+    return fetch.get(
         `/content/?${formatFilter(filter)}`,
     ).then(resp => resp.data);
 }

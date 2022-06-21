@@ -3,7 +3,7 @@ const fetch = require(".");
 function postUser(user) {
     return fetch.post(
         "/content/",
-        {data: user}
+        user
     ).then(resp => resp.data);
 }
 

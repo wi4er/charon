@@ -33,7 +33,7 @@ services:
       - .:/app
 
   user:
-    image: wi4er/groot:0.11.5
+    image: wi4er/groot:0.13.0
     container_name: user_api
     environment:
       DB_HOST: mongo

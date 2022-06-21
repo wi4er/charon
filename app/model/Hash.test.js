@@ -15,6 +15,21 @@ jest.mock("../../environment", () => ({
 
 describe("Hash entity", () => {
     describe("Hash fields", () => {
+        test("Should update dates", async () => {
+            const inst = await new Hash({
+                user: "333",
+                hash: "123",
+                algorithm: "sha256",
+            }).save();
+
+            const {timestamp, created} = inst;
+            inst.created = new Date();
+            await inst.save();
+
+            expect(inst.timestamp).not.toBe(timestamp);
+            expect(inst.created).toBe(created);
+        });
+
         test("Should create", async () => {
             const auth = await new Hash({
                 user: "333",
